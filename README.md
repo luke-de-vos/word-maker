@@ -1,6 +1,6 @@
 # word-maker
 
-Generates words with 4-grams and markov chains.
+Generates words with character 4-grams and markov chains.
 
 Gram length can be adjusted by modifying variable 'gramLen'.
 

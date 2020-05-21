@@ -8,7 +8,7 @@ import random
 import sys
 
 '''
-FUNCTIONS
+FUNCTIONS ==
 '''
 
 #return total of all ngram counts in list
@@ -98,10 +98,10 @@ print("<Hit ENTER to generate word>")
 while input() == '':
 	output=""
 	if len(sys.argv) > 1 and len(sys.argv[1]) >= gramLen:
-		output = sys.argv[1]
+		output = sys.argv[1].lower()
 	else:
 		output = getFirstGram()
-	while output[-1] != '\n':	
+	while output[-1] != '\n':
 		output = output + getNextChar(output)
 
 	#output result

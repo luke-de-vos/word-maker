@@ -11,7 +11,7 @@ To generate word:
   
   $python3 makeWord.py
   
-To generate word beginning with n or more specific characters:
+To generate word beginning with gramLen (4 by default) or more specific characters:
   
   $python3 makeWord.py exampleCharacters
  

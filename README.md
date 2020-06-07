@@ -1,6 +1,6 @@
 # word-maker
 
-Generates words with character n-grams and markov chains.
+Generates new words with character n-grams drawn from passed text file.
 
 Gram length can be adjusted by modifying variable 'gramLen'.
 

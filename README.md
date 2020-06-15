@@ -14,23 +14,21 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 
 ### FLAGS:
 
-- First item
-- Second item
-- Third item
-	- Indented item
-    - Indented item
-- Fourth item 
-
-- -c print generation with red and green highlights denoting particularly unusual or common generations respectively.
-			see COLOR CODING section below for details
+- -c 
+	- print generation with red and green highlights denoting particularly unusual or common generations respectively.
+	- see COLOR CODING section below for details
 - -i
-
-print extra information
-- -max NUM	set maximum length of generated word to NUM
-- -min NUM	set minimum length of generated word to NUM
-- -n NUM		set n-gram length to NUM
-- -s			program waits for user to hit ENTER to generate next character. Ideally paired with -v
-- -v			print in-progress generation every time a character is generated
+	- print extra information
+- -max NUM	
+	- set maximum length of generated word to NUM
+- -min NUM	
+	- set minimum length of generated word to NUM
+- -n NUM
+	- set n-gram length to NUM
+- -s
+	- wait for user to hit ENTER to generate next character. Ideally paired with -v
+- -v
+	- print in-progress generation every time a character is generated
 
 
 ### ROOT:
@@ -40,7 +38,7 @@ User can pass a word of length >=n-1 as the "root" of the generation. makeWord.p
 
 ### EXAMPLE EXECUTION
 
-$python3 makeword.py -max 12 -v rad
+`$python3 makeword.py -max 12 -v rad
 <Hit ENTER to generate word>
 
  rad
@@ -51,12 +49,14 @@ $python3 makeword.py -max 12 -v rad
  radicrol
  radicroli
  radicrolis
-  radicrolis
+  radicrolis`
 
 
 ### COLOR CODING:
-	Color coding for a given generated character is determined by how the probability of its generation compares to the average probability of all other possible genenerated characters in that state. If the generated character was more likely to appear than average, it is highlighted green. If it was less likely to appear than average, it is highlighted red. The brightness of the highlight corresponds to just how much more or less likely the character's generation was.
-	For example, let 'xyz' be an in-progress generation. If 'a' follows those characters 90% of the time and 'b' follows them 10% of the time, the average relative frequency in that state is 50%. 'a' is 40% more likely than average. Thus, if 'a' were generated, it would be shaded a bright green.
+Color coding for a given generated character is determined by how the probability of its generation compares to the average probability of all other possible genenerated characters in that state. If the generated character was more likely to appear than average, it is highlighted green. If it was less likely to appear than average, it is highlighted red. The brightness of the highlight corresponds to just how much more or less likely the character's generation was.
+
+
+For example, let 'xyz' be an in-progress generation. If 'a' follows those characters 90% of the time and 'b' follows them 10% of the time, the average relative frequency in that state is 50%. 'a' is 40% more likely than average. Thus, if 'a' were generated, it would be shaded a bright green.
 
 
 

@@ -28,7 +28,7 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 	- set n-gram length to NUM
 - `-s`
 	- wait for user to hit ENTER to generate next character. 
-	- use with -v
+	- use with `-v`
 - `-v`
 	- print in-progress generation every time a character is generated
 

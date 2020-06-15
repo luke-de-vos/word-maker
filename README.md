@@ -38,7 +38,7 @@ EXAMPLE EXECUTION
 
 $python3 makeword.py -max 12 -v rad
 
-<Hit ENTER to generate word>
+\<Hit ENTER to generate word\>
 
 
  rad

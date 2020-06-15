@@ -18,7 +18,8 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 	- print generation with red and green highlights denoting particularly unusual or common generations respectively.
 	- see COLOR CODING section below for details
 - `-i`
-	- print extra information
+	- print the relative frequency and rel freq - average for the last character generated
+	- use with `-v`
 - `-max NUM`	
 	- set maximum length of generated word to NUM
 - `-min NUM`	
@@ -26,7 +27,8 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 - `-n NUM`
 	- set n-gram length to NUM
 - `-s`
-	- wait for user to hit ENTER to generate next character. Ideally paired with -v
+	- wait for user to hit ENTER to generate next character. 
+	- use with -v
 - `-v`
 	- print in-progress generation every time a character is generated
 

@@ -38,6 +38,8 @@ User can pass a word of length >=n-1 as the "root" of the generation. makeWord.p
 
 ### EXAMPLE EXECUTION
 
+In this example, 
+
 	$python3 makeword.py -max 12 -v rad
 	<Hit ENTER to generate word>
 

@@ -14,20 +14,20 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 
 ### FLAGS:
 
-- -c 
+- `-c`
 	- print generation with red and green highlights denoting particularly unusual or common generations respectively.
 	- see COLOR CODING section below for details
-- -i
+- `-i`
 	- print extra information
-- -max NUM	
+- `-max NUM`	
 	- set maximum length of generated word to NUM
-- -min NUM	
+- `-min NUM`	
 	- set minimum length of generated word to NUM
-- -n NUM
+- `-n NUM`
 	- set n-gram length to NUM
-- -s
+- `-s`
 	- wait for user to hit ENTER to generate next character. Ideally paired with -v
-- -v
+- `-v`
 	- print in-progress generation every time a character is generated
 
 
@@ -38,7 +38,7 @@ User can pass a word of length >=n-1 as the "root" of the generation. makeWord.p
 
 ### EXAMPLE EXECUTION
 
-In this example, 
+In this example, 'rad' is passed as a root.
 
 	$python3 makeword.py -max 12 -v rad
 	<Hit ENTER to generate word>

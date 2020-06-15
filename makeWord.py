@@ -4,21 +4,6 @@ Generate words with char ngrams markov chains
 2020 11 June
 '''
 
-'''
-TODO
-transition from ngram list representation to dicts of n-1gram keys with a list of char,frequency tuples as associated value
-add --help
-
-'''
-
-'''
-NOTE
-color coding
-	based on relative frequency compared to average relative frequency of other possible generations given that state
-	stored in likelyL
-	values of likelyL are (rel freq - average rel freq) for each generated char
-
-'''
 
 import random
 import sys
@@ -152,7 +137,7 @@ def cPrint(string):	#(string)
 ========================
 '''
 
-trainingSet = "Corpora/dictionary.txt"	#file from which ngrams are drawn
+trainingSet = "dictionary.txt"	#file from which ngrams are drawn
 gramLen=4			#gram length
 startGramD={} 		#dict of char ngrams that begin words in the training set
 gramD={}			#dict of the rest of the char ngrams in the training set

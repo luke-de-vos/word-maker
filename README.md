@@ -7,14 +7,14 @@ The chance for given character to be generated is equal to the relative frequenc
 
 ### USAGE:
   
-$python3 makeWord.py FLAG(S) ROOT
+'$python3 makeWord.py FLAG(S) ROOT'
 
 Flags and root are optional. Flags and root will modify the functionality of makeWord.py.
 
 
 ### FLAGS:
 
--c			print generation with red and green highlights denoting particularly unusual or common generations respectively.
+-c \t \t print generation with red and green highlights denoting particularly unusual or common generations respectively.
 			see COLOR CODING section below for details
 -i			print extra information
 -max NUM	set maximum length of generated word to NUM

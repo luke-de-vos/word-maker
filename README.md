@@ -38,18 +38,18 @@ User can pass a word of length >=n-1 as the "root" of the generation. makeWord.p
 
 ### EXAMPLE EXECUTION
 
-`$python3 makeword.py -max 12 -v rad
-<Hit ENTER to generate word>
+	$python3 makeword.py -max 12 -v rad
+	<Hit ENTER to generate word>
 
- rad
- radi
- radic
- radicr
- radicro
- radicrol
- radicroli
- radicrolis
-  radicrolis`
+ 	rad
+	radi
+	radic
+ 	radicr
+ 	radicro
+ 	radicrol
+ 	radicroli
+ 	radicrolis
+ 	 radicrolis
 
 
 ### COLOR CODING:

@@ -1,6 +1,6 @@
 # word-maker
 
-makeWord.py generates words with character n-grams and markov chains. Default n-gram length is 4. N-grams are drawn from an English dictionary of ~450,000 terms. A lemma may appear many times with different prefixes and suffixes.
+makeWord.py generates words with character n-grams and markov chains. By default, n is set to 4. N-grams are drawn from an English dictionary of ~450,000 terms. A lemma may appear many times with different prefixes and suffixes.
 
 Chance for initial gram (of length n-1) to be selected is equal to the relative frequency of that initial gram.
 The chance for given character to be generated is equal to the relative frequency of that char following the last n-1 characters.

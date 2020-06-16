@@ -17,7 +17,8 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 	- print generation with red and green highlights denoting particularly unusual or common generations respectively.
 	- see COLOR CODING section below for details
 - `-i`
-	- print the relative frequency and rel freq - average for the last character generated
+	- print the relative frequency and (rel freq - average rel freq) for the last character generated
+	- see COLOR CODING for details on the above values
 	- use with `-v`
 - `-max NUM`	
 	- set maximum length of generated word to NUM

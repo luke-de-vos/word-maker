@@ -1,13 +1,32 @@
 '''
 Luke De Vos
 Generate words with char ngrams markov chains
-2020 11 June
 '''
 
+'''
+TODO
+transition from ngram list representation to dicts of n-1gram keys with a list of char,frequency tuples as associated value
+add --help
+
+'''
+
+'''
+NOTE
+color coding
+	based on relative frequency compared to average relative frequency of other possible generations given that state
+	stored in likelyL
+	values of likelyL are (rel freq - average rel freq) for each generated char
+
+	could be better. when there are a tonnnn of possible next chars, even one that occurs a little above average will be green despite being vastly less common than the most likely pick
+		perhaps color code based on how much less likely a pick is compared to the most likely pick
+			difference or product? ie 40% pick when 50% is greatest chance should not be colored the same as 5% pick when 15% is most common?
+		or just color code 
+'''
 
 import random
 import sys
 import re
+import time
 from sty import fg, bg, rs
 
 '''
@@ -104,7 +123,7 @@ def getNextChar(output, NN):	#(string, bool)
 			return matchList[i][0][-1]
 
 #color print
-def cPrint(string):	#(string)
+def cPrint(string):
 	global likelyL
 	global initLen
 	j=0
@@ -137,7 +156,7 @@ def cPrint(string):	#(string)
 ========================
 '''
 
-trainingSet = "dictionary.txt"	#file from which ngrams are drawn
+trainingSet="dictionary.txt"	#file from which ngrams are drawn
 gramLen=4			#gram length
 startGramD={} 		#dict of char ngrams that begin words in the training set
 gramD={}			#dict of the rest of the char ngrams in the training set
@@ -156,15 +175,18 @@ root=''		#assigned to final arg if it is a [A-Za-z] word, not a flag
 			#serves as base from which to generate more characters
 minNo=0		#minimum length of generated word. set with -min flag
 maxNo=1000	#maxmimum length of generated word. set with -max flag
+secs=0		#time between generations if -t NUM is passed
 #bools set with flags of the corresponding letter. if True...
 vSet=False	#generation is printed each time a character is generated
 cSet=False	#generated chars are highlighted red if their generation was "unusual", green if it was particularly likely
 sSet=False	#user must hit ENTER to generate next char. Ideally paired with -v
-iSet=False	#outputs extra info. first column is generated char's relative frequency (and probability of generation given previous state), second column is 
+iSet=False	#outputs two columns of extra info for most recently generated char
+tSet=False	#next character is generated each x seconds. x passed as argument following -t
+
 if len(sys.argv) > 1:
 	line=" ".join(sys.argv[1:])
 	#ensure command line args fit form that will be processed correctly
-	match=re.match("^((\-(min|max|n) [0-9]+)( |$)|(\-[vcsi])( |$))*( *[a-zA-Z]+)? *$", line) #what a doozy
+	match=re.match("^((\-(min|max|n|t) [0-9]+)( |$)|(\-[vcsi])( |$))*( *[a-zA-Z]+)? *$", line) #what a doozy
 	if match == None:
 		print('Invalid arguments syntax')
 		sys.exit()
@@ -175,10 +197,13 @@ if len(sys.argv) > 1:
 			minNo = int(sys.argv[i+1])
 		elif sys.argv[i] == '-max':
 			maxNo = int(sys.argv[i+1])
-		elif sys.argv[i] == '-v':
-			vSet = True
 		elif sys.argv[i] == '-n':
 			gramLen = int(sys.argv[i+1])
+		elif sys.argv[i] == '-t':
+			tSet = True
+			secs = int(sys.argv[i+1])
+		elif sys.argv[i] == '-v':
+			vSet = True
 		elif sys.argv[i] == '-c':
 			cSet = True
 		elif sys.argv[i] == '-s':
@@ -280,8 +305,10 @@ while input() == '':
 					output = output[0:-1]
 					if likelyL: likelyL.pop()
 					if relFreqL: relFreqL.pop()
-		if sSet:	#wait for user to hit enter to generate next character
+		if sSet:
 			input()
+		if tSet:
+			time.sleep(secs)
 
 	#print final complete generation
 	if cSet:

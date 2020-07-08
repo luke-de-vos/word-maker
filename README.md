@@ -14,24 +14,21 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 ### FLAGS:
 
 - `-c`
-	- print generation with red and green highlights denoting particularly unusual or common generations respectively.
+	- print generation with green and highlights denoting particularly expected or unexpected generations respectively.
 	- see COLOR CODING section below for details
 - `-i`
-	- print the relative frequency and (rel freq - average rel freq) for the last character generated
-	- see COLOR CODING for details on the above values
-	- use with `-v`
+	- print the relative frequency and relative 'expectedness' for each character generated
+	- see COLOR CODING section below for details
+- `-m`
+	- wait for user to hit ENTER to generate next character. 
 - `-max NUM`	
 	- set maximum length of generated word to NUM
 - `-min NUM`	
 	- set minimum length of generated word to NUM
 - `-n NUM`
 	- set n-gram length to NUM
-- `-s`
-	- wait for user to hit ENTER to generate next character. 
-	- use with `-v`
 - `-t NUM`
 	- wait NUM seconds to generate next character. 
-	- use with `-v`
 - `-v`
 	- print in-progress generation every time a character is generated
 
@@ -60,7 +57,7 @@ In this example, 'rad' is passed as a root.
 
 
 ### COLOR CODING:
-Color coding for a given generated character is determined by how the probability of its generation compares to the average probability of all other possible genenerated characters in that state. If the generated character was more likely to appear than average, it is highlighted green. If it was less likely to appear than average, it is highlighted red. The brightness of the highlight corresponds to just how much more or less likely the character's generation was.
+Color coding for a given generated character is determined by how the probability of its generation compares to the average probability of all other possible genenerated characters in that state. I refer to this to as the character's 'expectedness'. If the generated character was more likely to appear than average, it is highlighted green. If it was less likely to appear than average, it is highlighted red. The brightness of the highlight corresponds to the degree to which it was expected or unexpected.
 
 
 For example, let 'xyz' be an in-progress generation. If 'a' follows those characters 90% of the time and 'b' follows them 10% of the time, the average relative frequency in that state is 50%. 'a' is 40% more likely than average. Thus, if 'a' were generated, it would be shaded a bright green.

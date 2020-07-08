@@ -27,7 +27,7 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 	- set minimum length of generated word to NUM
 - `-n NUM`
 	- set n-gram length to NUM
-	- longer n-grams yield more convincing fake words but are more likely to repeat real words
+	- longer n-grams tend to yield more convincing fake words but are more likely to generate real words.
 - `-t NUM`
 	- wait NUM seconds to generate next character. 
 - `-v`

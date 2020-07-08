@@ -1,26 +1,12 @@
 '''
 Luke De Vos
-Generate words with char ngrams markov chains
+Generate words with char ngrams and markov chains
 '''
 
 '''
 TODO
-transition from ngram list representation to dicts of n-1gram keys with a list of char,frequency tuples as associated value
 add --help
 
-'''
-
-'''
-NOTE
-color coding
-	based on relative frequency compared to average relative frequency of other possible generations given that state
-	stored in likelyL
-	values of likelyL are (rel freq - average rel freq) for each generated char
-
-	could be better. when there are a tonnnn of possible next chars, even one that occurs a little above average will be green despite being vastly less common than the most likely pick
-		perhaps color code based on how much less likely a pick is compared to the most likely pick
-			difference or product? ie 40% pick when 50% is greatest chance should not be colored the same as 5% pick when 15% is most common?
-		or just color code 
 '''
 
 import random
@@ -32,111 +18,82 @@ from sty import fg, bg, rs
 '''
 FUNCTIONS ==
 '''
-
-#return total of all ngram counts in a list
-def getSum(passedL):	#(list of [ngram, count]s)
-	total=0
-	for entry in passedL:
-		total += entry[1]
-	return total
-
-#returns True if passed grams "gram match"
-def isGramMatch(gram1, gram2): 	#(string, string)
-	if gram1[1:] == gram2[0:-1]: #XYY == YYZ
-		return True
-	return False
-
 #returns true if passed string has a non-whitespace next char in passed list
-def hasNextLetter(string):
-	global gramLNN
-	matchList=[]
-	thisGram=string[-gramLen:]
-	for entry in gramLNN:
-		if isGramMatch(thisGram, entry[0]):
-			matchList.append(entry)
-	#print('matchList for \'' + string[-gramLen:] + '\': ' + str(matchList))
-	if len(matchList) == 0:
+def canContinue(passKey): #(string)
+	global gramD
+	if passKey in gramD:
+		if len(gramD[passKey]) == 1:
+			if '\n' in gramD[passKey]:
+				return False
+		return True	
+	else:
 		return False
-	return True
-
-#return list of relative frequencies. each entry is the rel freq of a term in passed list of gram:count lists
-def getRelFreqs(L):
-	totalGrams=getSum(L)
-	newL=[]	#store rel freqs, return at end
-	for entry in L:
-		newL.append(entry[1]/totalGrams)
-	return newL
-
-#return average (float) of elements in passed list of numbers
-def getAvg(L):
-	total=0
-	for entry in L:
-		total += entry
-	return total/len(L)
 
 #generates gram to start generation
-#returns string of length gramLen
 def getFirstGram():
-	global startGramL 
-	global likelyL
+	global totalStartGrams
+	global startGramD
 	global relFreqL
-	rfL=getRelFreqs(startGramL)
-	if iSet or cSet: avg=getAvg(rfL)
-	while True:
-		chance=0.0
-		r=random.random()
-		for i in range(len(startGramL)):
-			chance += rfL[i]
-			if r < chance:
-				if hasNextLetter(startGramL[i][0]):
-					if iSet or cSet: likelyL.append(rfL[i] - avg)
-					if iSet: relFreqL.append(rfL[i])
-					return startGramL[i][0]
-				break
-			
-
-#determines and returns a character based on the last gramLen-1 generated characters
-def getNextChar(output, NN):	#(string, bool)
-	global gramL
-	global gramLNN
-	global likelyL
-	lastGram = output[-gramLen:]
-	#get list of matches
-	matchList=[]
-	if NN: 
-		for entry in gramLNN:
-			if isGramMatch(lastGram, entry[0]):
-				matchList.append(entry)
-	else:
-		for entry in gramL:
-			if isGramMatch(lastGram, entry[0]):
-				matchList.append(entry)
-	chance = 0.0
+	global expectL
 	r=random.random()
-	rfL=getRelFreqs(matchList)		#rfL is a list of the relative frequencies of the terms in matchList
-	if iSet or cSet: avg=getAvg(rfL)	#avg is the average value of rfL
-	for i in range(len(matchList)):
-		chance += rfL[i]
-		if r < chance:
-			if iSet or cSet: likelyL.append(rfL[i] - avg)
-			if iSet: relFreqL.append(rfL[i])
-			return matchList[i][0][-1]
+	cumu=0.0
+	for key, value in startGramD.items():
+		cumu += value/totalStartGrams
+		if r < cumu:
+			if iSet or cSet:
+				relFreqL.append(value/totalStartGrams)
+				expectL.append(relFreqL[-1] - (1/len(startGramD)))
+			return key
+			
+#given a string of gramLen-1 characters (the 'state' of the generation),
+# returns the next letter to be generated, stored in a list.
+#if iSet or cSet, the above list also includes the values to append to relFreqL and expectL
+def getNextChar(passKey, NN): #(string, bool)
+	global gramD
+	global relFreqL
+	global expectL
+	totalVals=0		#used to determine relative frequency
+	options=len(gramD[passKey])	#used to determine relative 'expectedness'
 
-#color print
+	if NN and not canContinue(passKey):
+		return False
+
+	for val in gramD[passKey].values():
+		totalVals += val
+
+	attempts=0
+	while True:
+		attempts += 1
+		if attempts > 10000: return False
+		r=random.random()
+		cumu=0
+		for letter, val in gramD[passKey].items():
+			cumu += val/totalVals
+			if r < cumu:
+				if NN and letter == '\n':
+					break
+				else:
+					tempL=[letter]
+					if iSet or cSet: 
+						tempL.append(val/totalVals)
+						tempL.append((val/totalVals) - (1/options))
+					return tempL
+
+#color printing
 def cPrint(string):
-	global likelyL
+	global expectL
 	global initLen
 	j=0
 	for i in range(len(string) - (initLen-1)):
 		#if chance[i] is positive, it is more likely than average
 		c0=0
 		c1=0
-		if likelyL[i] < 0:
-			c0 = int(-likelyL[i] * 6 * 255)
+		if expectL[i] < 0:
+			c0 = int(-expectL[i] * 6 * 255)
 			if c0 > 255:
 				c0 = 255
-		elif likelyL[i] > 0:
-			c1 = int(likelyL[i] * 200)
+		elif expectL[i] > 0:
+			c1 = int(expectL[i] * 200)
 		#clump together initial gram or passed root
 		if i==0:
 			while j < initLen:
@@ -151,42 +108,52 @@ def cPrint(string):
 			j+=1
 	print()
 
+#prints stats detailed in iSet and used for coloring. 
+def printStats():
+	global relFreqL
+	global expectL
+	sign=''
+	print(str(round(relFreqL[-1]*100, 2))+'%\t',end='')
+	if expectL[-1] >= 0:
+		sign = '+'
+	print(sign+str(round(expectL[-1]*100, 2))+'%\t',end='')
 
 '''
-========================
+MAIN ========================
 '''
 
+#VARIABLE DECLARATIONS
 trainingSet="dictionary.txt"	#file from which ngrams are drawn
-gramLen=4			#gram length
+gramLen=4			#n-gram length
 startGramD={} 		#dict of char ngrams that begin words in the training set
 gramD={}			#dict of the rest of the char ngrams in the training set
 startGramL=[] 		#above dicts coverted to lists once completely written. for faster traversal
-gramL=[]			#"
-startGramLNN=[]		#copy of startGramL except no grams end with whitespace
-gramLNN=[]			#"
-likelyL=[]			#if iSet or cSet, for each char generated, likelyL appends the char's relative frequency minus the average relative frequency in the list of possible next chars
+expectL=[]			#if iSet or cSet, for each char generated, expectL appends the char's relative frequency minus the average relative frequency in the list of possible next chars
 relFreqL=[]			#if iSet, stores relative frequency of each generated char
+deadEndL=[]			#sets of letters that return False are added. used for backtracking
+totalStartGrams=0	#combined counts of all grams that begin words. used in relFreqL and expectL
 
-
-
-#COMMAND LINE ARGS
 root=''		#assigned to final arg if it is a [A-Za-z] word, not a flag
 			#otherwise assigned gram from a startGram list
 			#serves as base from which to generate more characters
-minNo=0		#minimum length of generated word. set with -min flag
-maxNo=1000	#maxmimum length of generated word. set with -max flag
-secs=0		#time between generations if -t NUM is passed
-#bools set with flags of the corresponding letter. if True...
+rootState=''#final characters of root to be used as the keys in gramD
+minLen=0	#minimum length of generated word. set with -min flag
+maxLen=1000	#maxmimum length of generated word. set with -max flag
+waitTime=0	#time between generations if -t NUM is passed
+
+#bools set with flags of the same initial letter
 vSet=False	#generation is printed each time a character is generated
 cSet=False	#generated chars are highlighted red if their generation was "unusual", green if it was particularly likely
-sSet=False	#user must hit ENTER to generate next char. Ideally paired with -v
+mSet=False	#user must hit ENTER to generate next char. Ideally paired with -v
 iSet=False	#outputs two columns of extra info for most recently generated char
 tSet=False	#next character is generated each x seconds. x passed as argument following -t
 
+
+#COMMAND LINE ARGS
 if len(sys.argv) > 1:
 	line=" ".join(sys.argv[1:])
 	#ensure command line args fit form that will be processed correctly
-	match=re.match("^((\-(min|max|n|t) [0-9]+)( |$)|(\-[vcsi])( |$))*( *[a-zA-Z]+)? *$", line) #what a doozy
+	match=re.match("^((\-(min|max|n|t|r) [0-9]+)( |$)|(\-[vcmiq])( |$))*( *[a-zA-Z]+)? *$", line) #what a doozy
 	if match == None:
 		print('Invalid arguments syntax')
 		sys.exit()
@@ -194,20 +161,20 @@ if len(sys.argv) > 1:
 	#flags
 	for i in range(1, len(sys.argv)):
 		if sys.argv[i] == '-min':
-			minNo = int(sys.argv[i+1])
+			minLen = int(sys.argv[i+1])
 		elif sys.argv[i] == '-max':
-			maxNo = int(sys.argv[i+1])
+			maxLen = int(sys.argv[i+1])
 		elif sys.argv[i] == '-n':
 			gramLen = int(sys.argv[i+1])
 		elif sys.argv[i] == '-t':
 			tSet = True
-			secs = int(sys.argv[i+1])
+			waitTime = int(sys.argv[i+1])
 		elif sys.argv[i] == '-v':
 			vSet = True
 		elif sys.argv[i] == '-c':
 			cSet = True
-		elif sys.argv[i] == '-s':
-			sSet = True
+		elif sys.argv[i] == '-m':
+			mSet = True
 		elif sys.argv[i] == '-i':
 			iSet = True
 
@@ -216,111 +183,114 @@ if len(sys.argv) > 1:
 	if match != None:
 		root = match.group().strip()
 		root = " "+root
+		rootState = root[-(gramLen-1):]
 	#check root
-	while (len(root) > 0 and len(root) < gramLen):	#no -1 because " " is added to beginning
-		print("Passed word must be at least (" + str(gramLen-1) + ") characters long")
+	while (len(root) > 0 and len(root) < gramLen-1):	#not -2 because " " is added to beginning
+		print("Root must be at least (" + str(gramLen-2) + ") characters long")
 		print("Please re-enter: ")
 		root = " "+input()
+		rootState = root[-(gramLen-1):]
+
+print('Loading...')
 
 #populate startGramD and gramD 
 with open(trainingSet) as file:
 	for line in file:
 		line=" "+line
 		for i in range(len(line)-gramLen+1): #+1 to include newline
-			gram = line[i:i+gramLen]
+			key = line[i:i+gramLen-1]
+			valChar = line[i+gramLen-1]
 			if i == 0:
-				if gram in startGramD:
-					startGramD[gram] += 1
+				totalStartGrams += 1
+				if key in startGramD:
+					startGramD[key] += 1
 				else:
-					startGramD[gram] = 1
+					startGramD[key] = 1
+			if key in gramD:
+				if valChar in gramD[key]:
+					gramD[key][valChar] += 1
+				else:
+					gramD[key][valChar] = 1
 			else:
-				if gram in gramD:
-					gramD[gram] += 1
-				else:
-					gramD[gram] = 1
-#sort dicts by value, high low
-gramD={k: v for k, v in sorted(gramD.items(), key=lambda item: item[1], reverse=True)}
-startGramD={k: v for k, v in sorted(startGramD.items(), key=lambda item: item[1], reverse=True)}
-#convert dicts to lists
-#also create versions without trailing \n
-for key in gramD:
-	gramL.append([key])
-	gramL[-1].append(gramD[key])
-	if key[-1] != '\n':
-		gramLNN.append([key])
-		gramLNN[-1].append(gramD[key])
-for key in startGramD:
-	startGramL.append([key])
-	startGramL[-1].append(startGramD[key])
-	if key[-1] != '\n':
-		startGramLNN.append([key])
-		startGramLNN[-1].append(startGramD[key])
+				gramD[key] = {}
+				gramD[key][valChar] = 1
 
-#check root again, now with gram info
-while (len(root) > 0 and len(root) < gramLen-1) or root != '' and not hasNextLetter(root):
+#check that root is valid again, now with gram info
+while (len(root) > 0 and len(root) < gramLen-1) or root != '' and not canContinue(rootState):
 	if (len(root) > 0 and len(root) < gramLen-1):
-		print("Passed word must be at least (" + str(gramLen-1) + ") characters long")
-	elif not hasNextLetter(root):
-		print("Passed word is never followed by a non-whitespace character")
+		print("Root must be at least (" + str(gramLen-2) + ") characters long")
+	elif not canContinue(rootState):
+		print("Root is never followed by a non-whitespace character")
 	print("Please re-enter: ")
 	root = " "+input()
-		
+	rootState = root[-(gramLen-1):]
 
 #GENERATION
-output=''	#generated characters added to output. output printed when complete
-nextChar=''
-NN=False	#"No Newline"
-initLen=0
-print("\n<Hit ENTER to generate word>")
+gen=''		#'generation'. generated characters added to gen. gen printed when complete
+NN=False	#"No Newline". passed to getNextChar() when the word should not end
+initLen=0	#length of passed root or initial gram
+print("<Hit ENTER to generate words>")
+
 while input() == '':
-	deadEndL=[]
-	likelyL=[]
-	relFreqL=[]
+	
 	if root == '': #user did not pass a root
-		output = getFirstGram()
+		gen = getFirstGram()
 	else:
-		output = root
-		if iSet or cSet: likelyL.append(0)
-		if iSet: relFreqL.append(0)
-	initLen = len(output)	#initial length
-	while output[-1] != '\n':
-		if vSet: 
+		gen = root
+		if iSet or cSet: 
+			relFreqL.append(1)
+			expectL.append(0)
+
+	initLen = len(gen)
+
+	while gen[-1] != '\n':
+		if vSet or iSet or mSet or tSet: 
 			if iSet:
-				sign=''
-				print(str(round(relFreqL[-1]*100, 2))+'%\t',end='')
-				if likelyL[-1] >= 0: sign='+'
-				print(sign+str(round(likelyL[-1]*100, 2))+'%\t',end='')
-			print(output,end='')
-			print()
-		if len(output) < minNo+1:	#+1 because trailing whitespace is part of generation
+				printStats()
+			print(gen)
+
+		if len(gen) < minLen+1:	#+1 because trailing whitespace is part of generation
 			NN = True
 		else:
 			NN = False
-		if len(output.strip()) <= maxNo:
-			output = output + getNextChar(output, NN)	
+
+		#action
+		state=gen[-(gramLen-1):]
+		result=getNextChar(state, NN)
+		if result != False and len(gen.strip()) <= maxLen:
+			gen = gen + result[0]
+			if iSet or cSet:
+				relFreqL.append(result[1])
+				expectL.append(result[2])
 		else:
-			deadEndL.append(output[-gramLen:])
-			for i in range(deadEndL.count(output[-gramLen:])):
-				if len(output) > initLen:
-					output = output[0:-1]
-					if likelyL: likelyL.pop()
-					if relFreqL: relFreqL.pop()
-		if sSet:
+			deadEndL.append(state)
+			for i in range(deadEndL.count(state)):
+				if len(gen) > initLen:
+					gen = gen[0:-1]
+					if iSet or cSet: 
+						expectL.pop()
+						relFreqL.pop()
+				else: 
+					break
+
+		if mSet:
 			input()
 		if tSet:
-			time.sleep(secs)
+			time.sleep(waitTime)
+
 
 	#print final complete generation
+	if iSet:
+		printStats()
+
 	if cSet:
-		if iSet:
-			sign=''
-			print(str(round(relFreqL[-1]*100, 2))+'%\t',end='')
-			if likelyL[-1] >= 0: sign='+'
-			print(sign+str(round(likelyL[-1]*100, 2))+'%\t',end='')
-		print(" ",end='')
-		cPrint(output)
+		cPrint(gen)
 	else:
-		print(" "+output,end='')
+		print(gen,end='')
+
+	deadEndL.clear()
+	expectL.clear()
+	relFreqL.clear()
 
 print("EXIT")
 

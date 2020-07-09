@@ -14,29 +14,32 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 ### FLAGS:
 
 - `-c`
-	- print generation with green and highlights denoting particularly expected or unexpected generations respectively.
+	- print generation with green and highlights denoting particularly expected or unexpected generations respectively
 	- see COLOR CODING section below for details
 - `-i`
 	- print the relative frequency and relative 'expectedness' for each character generated
 	- see COLOR CODING section below for details
+	- implements -v
 - `-m`
-	- wait for user to hit ENTER to generate next character. 
+	- wait for user to hit ENTER to generate next character
+	- implements -v
 - `-max NUM`	
 	- set maximum length of generated word to NUM
 - `-min NUM`	
 	- set minimum length of generated word to NUM
 - `-n NUM`
 	- set n-gram length to NUM
-	- longer n-grams tend to yield more convincing fake words but are more likely to generate real words.
+	- longer n-grams tend to yield more convincing fake words but are more likely to generate real words
 - `-t NUM`
-	- wait NUM seconds to generate next character. 
+	- wait NUM seconds to generate each character
+	- implements -v
 - `-v`
 	- print in-progress generation every time a character is generated
 
 
 ### ROOT:
 
-User can pass a word of length >=n-1 as the "root" of the generation. makeWord.py will build off of this root to generate a word.
+User can pass a string of length >=n-1 as the final command line argument to serve as the "root" of the generation. The program will build off of this root to generate a word.
 
 
 ### EXAMPLE EXECUTION

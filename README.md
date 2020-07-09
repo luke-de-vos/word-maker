@@ -54,7 +54,7 @@ In this example, 'rad' is passed as a root.
  	radicrol
  	radicroli
  	radicrolis
- 	 radicrolis
+ 	radicrolis
 
 
 ### COLOR CODING:

@@ -61,10 +61,10 @@ In this example, 'rad' is passed as the (optional) root.
 
 
 ### COLOR CODING:
-Color coding for a given generated character is determined by how the probability of its generation compares to the average probability of all other possible genenerated characters in that state. I refer to this to as the character's 'expectedness'. If the generated character was more likely to appear than average, it is highlighted green. If it was less likely to appear than average, it is highlighted red. The brightness of the highlight corresponds to the degree to which it was expected or unexpected.
+If the -c flag is passed, characters may be highlighted green or red to denote 'expected' and 'unexpected' generations respectively. A generated character's expectedness is determined by how the probability of its generation compares to the average probability of all other possible genenerated characters given the last n-1 characters. The brightness of the highlight corresponds to the magnitude of its (un)expectedness.
 
 
-For example, let 'xyz' be an in-progress generation. If 'a' follows those characters 90% of the time and 'b' follows them 10% of the time, the average relative frequency in that state is 50%. 'a' is 40% more likely than average. Thus, if 'a' were generated, it would be shaded a bright green.
+For example, let n=4 and 'xyz' be the last n-1 characters of an in-progress generation. If, in the training set, 'a' follows those characters 90% of the time and 'b' follows them 10% of the time, the average relative frequency in that state is 50%. In this case, 'a' is 40% more likely than average. Thus, if 'a' were generated, it would be shaded a bright green.
 
 
 

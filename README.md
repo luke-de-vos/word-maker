@@ -44,7 +44,7 @@ User can pass a string of length >=n-1 as the final command line argument to ser
 
 ### EXAMPLE EXECUTION
 
-In this example, 'rad' is passed as a root.
+In this example, 'rad' is passed as the (optional) root.
 
 	$python3 makeword.py -max 12 -v rad
 	<Hit ENTER to generate word>

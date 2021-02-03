@@ -42,7 +42,7 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 
 ### ROOT:
 
-User can pass a string of length >=n-1 as the final command line argument to serve as the "root" of the generation. The program will build off of this root to generate a word.
+User can pass a string of length >=n-1 as the final command line argument to serve as the "root" of the generation. **makeWord.py** will build off of this root to generate a word.
 
 
 ### EXAMPLE EXECUTION

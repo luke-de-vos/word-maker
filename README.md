@@ -7,14 +7,14 @@ Words are generated on a character by character basis. The likelihood of a chara
 The default training set is an English dictionary of ~450,000 terms. There are separate entries for each word's different possible prefixes and suffixes, such as run and running.
 
 
-### USAGE:
+### USAGE
   
 `$python3 makeWord.py FLAG(S) ROOT`
 
 Flags and root are optional. Flags and root will modify the functionality of makeWord.py.
 
 
-### FLAGS:
+### FLAGS
 
 - `-c`
 	- print generation with green and highlights denoting particularly expected or unexpected generations respectively
@@ -40,7 +40,7 @@ Flags and root are optional. Flags and root will modify the functionality of mak
 	- print in-progress generation every time a character is generated
 
 
-### ROOT:
+### ROOT
 
 User can pass a string of length >=n-1 as the final command line argument to serve as the "root" of the generation. **makeWord.py** will build off of this root to generate a word.
 
@@ -63,7 +63,7 @@ In this example, 'rad' is passed as the (optional) root.
  	radicrolis
 
 
-### COLOR CODING:
+### COLOR CODING
 If the -c flag is passed, characters may be highlighted green or red to denote 'expected' and 'unexpected' generations respectively. A generated character's expectedness is determined by how the probability of its generation compares to the average probability of all other possible genenerated characters given the last n-1 characters. The brightness of the highlight corresponds to the magnitude of its (un)expectedness.
 
 

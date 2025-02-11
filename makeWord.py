@@ -1,23 +1,10 @@
-'''
-Luke De Vos
-Generate words with char ngrams and markov chains
-'''
-
-'''
-TODO
-add --help
-
-'''
-
 import random
 import sys
 import re
 import time
 from sty import fg, bg, rs
 
-'''
-FUNCTIONS ==
-'''
+
 #returns true if passed string has a non-whitespace next char in passed list
 def canContinue(passKey): #(string)
 	global gramD

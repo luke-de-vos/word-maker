@@ -118,181 +118,180 @@ def printStats():
 		sign = '+'
 	print(sign+str(round(expectL[-1]*100, 2))+'%\t',end='')
 
-'''
-MAIN ========================
-'''
 
-#VARIABLE DECLARATIONS
-trainingSet="dictionary.txt"	#file from which ngrams are drawn
-gramLen=4			#n-gram length
-startGramD={} 		#dict of char ngrams that begin words in the training set
-gramD={}			#dict of the rest of the char ngrams in the training set
-startGramL=[] 		#above dicts coverted to lists once completely written. for faster traversal
-expectL=[]			#if iSet or cSet, for each char generated, expectL appends the char's relative frequency minus the average relative frequency in the list of possible next chars
-relFreqL=[]			#if iSet, stores relative frequency of each generated char
-deadEndL=[]			#sets of letters that return False are added. used for backtracking
-totalStartGrams=0	#combined counts of all grams that begin words. used in relFreqL and expectL
+if __name__ == '__main__':
 
-root=''		#assigned to final arg if it is a [A-Za-z] word, not a flag
-			#otherwise assigned gram from a startGram list
-			#serves as base from which to generate more characters
-rootState=''#final characters of root to be used as the keys in gramD
-minLen=0	#minimum length of generated word. set with -min flag
-maxLen=1000	#maxmimum length of generated word. set with -max flag
-waitTime=0	#time between generations if -t NUM is passed
+	#VARIABLE DECLARATIONS
+	trainingSet="dictionary.txt"	#file from which ngrams are drawn
+	gramLen=4			#n-gram length
+	startGramD={} 		#dict of char ngrams that begin words in the training set
+	gramD={}			#dict of the rest of the char ngrams in the training set
+	startGramL=[] 		#above dicts coverted to lists once completely written. for faster traversal
+	expectL=[]			#if iSet or cSet, for each char generated, expectL appends the char's relative frequency minus the average relative frequency in the list of possible next chars
+	relFreqL=[]			#if iSet, stores relative frequency of each generated char
+	deadEndL=[]			#sets of letters that return False are added. used for backtracking
+	totalStartGrams=0	#combined counts of all grams that begin words. used in relFreqL and expectL
 
-#bools set with flags of the same initial letter
-vSet=False	#generation is printed each time a character is generated
-cSet=False	#generated chars are highlighted red if their generation was "unusual", green if it was particularly likely
-mSet=False	#user must hit ENTER to generate next char. Ideally paired with -v
-iSet=False	#outputs two columns of extra info for most recently generated char
-tSet=False	#next character is generated each x seconds. x passed as argument following -t
+	root=''		#assigned to final arg if it is a [A-Za-z] word, not a flag
+				#otherwise assigned gram from a startGram list
+				#serves as base from which to generate more characters
+	rootState=''#final characters of root to be used as the keys in gramD
+	minLen=0	#minimum length of generated word. set with -min flag
+	maxLen=1000	#maximum length of generated word. set with -max flag
+	waitTime=0	#time between generations if -t NUM is passed
+
+	#bools set with flags of the same initial letter
+	vSet=False	#generation is printed each time a character is generated
+	cSet=False	#generated chars are highlighted red if their generation was "unusual", green if it was particularly likely
+	mSet=False	#user must hit ENTER to generate next char. Ideally paired with -v
+	iSet=False	#outputs two columns of extra info for most recently generated char
+	tSet=False	#next character is generated each x seconds. x passed as argument following -t
 
 
-#COMMAND LINE ARGS
-if len(sys.argv) > 1:
-	line=" ".join(sys.argv[1:])
-	#ensure command line args fit form that will be processed correctly
-	match=re.match("^((\-(min|max|n|t|r) [0-9]+)( |$)|(\-[vcmiq])( |$))*( *[a-zA-Z]+)? *$", line) #what a doozy
-	if match == None:
-		print('Invalid arguments syntax')
-		sys.exit()
+	#COMMAND LINE ARGS
+	if len(sys.argv) > 1:
+		line=" ".join(sys.argv[1:])
+		#ensure command line args fit form that will be processed correctly
+		match=re.match("^((\-(min|max|n|t|r) [0-9]+)( |$)|(\-[vcmiq])( |$))*( *[a-zA-Z]+)? *$", line)
+		if match == None:
+			print('Invalid arguments syntax')
+			sys.exit()
 
-	#flags
-	for i in range(1, len(sys.argv)):
-		if sys.argv[i] == '-min':
-			minLen = int(sys.argv[i+1])
-		elif sys.argv[i] == '-max':
-			maxLen = int(sys.argv[i+1])
-		elif sys.argv[i] == '-n':
-			gramLen = int(sys.argv[i+1])
-		elif sys.argv[i] == '-t':
-			tSet = True
-			waitTime = int(sys.argv[i+1])
-		elif sys.argv[i] == '-v':
-			vSet = True
-		elif sys.argv[i] == '-c':
-			cSet = True
-		elif sys.argv[i] == '-m':
-			mSet = True
-		elif sys.argv[i] == '-i':
-			iSet = True
+		#flags
+		for i in range(1, len(sys.argv)):
+			if sys.argv[i] == '-min':
+				minLen = int(sys.argv[i+1])
+			elif sys.argv[i] == '-max':
+				maxLen = int(sys.argv[i+1])
+			elif sys.argv[i] == '-n':
+				gramLen = int(sys.argv[i+1])
+			elif sys.argv[i] == '-t':
+				tSet = True
+				waitTime = int(sys.argv[i+1])
+			elif sys.argv[i] == '-v':
+				vSet = True
+			elif sys.argv[i] == '-c':
+				cSet = True
+			elif sys.argv[i] == '-m':
+				mSet = True
+			elif sys.argv[i] == '-i':
+				iSet = True
 
-	#match passed root
-	match = re.match("^[A-Za-z]+ *$", sys.argv[-1])
-	if match != None:
-		root = match.group().strip()
-		root = " "+root
-		rootState = root[-(gramLen-1):]
-	#check root
-	while (len(root) > 0 and len(root) < gramLen-1):	#not -2 because " " is added to beginning
-		print("Root must be at least (" + str(gramLen-2) + ") characters long")
+		#match passed root
+		match = re.match("^[A-Za-z]+ *$", sys.argv[-1])
+		if match != None:
+			root = match.group().strip()
+			root = " "+root
+			rootState = root[-(gramLen-1):]
+		#check root
+		while (len(root) > 0 and len(root) < gramLen-1):	#not -2 because " " is added to beginning
+			print("Root must be at least (" + str(gramLen-2) + ") characters long")
+			print("Please re-enter: ")
+			root = " "+input()
+			rootState = root[-(gramLen-1):]
+
+	print('Loading...')
+
+	#populate startGramD and gramD 
+	with open(trainingSet) as file:
+		for line in file:
+			line=" "+line
+			for i in range(len(line)-gramLen+1): #+1 to include newline
+				key = line[i:i+gramLen-1]
+				valChar = line[i+gramLen-1]
+				if i == 0:
+					totalStartGrams += 1
+					if key in startGramD:
+						startGramD[key] += 1
+					else:
+						startGramD[key] = 1
+				if key in gramD:
+					if valChar in gramD[key]:
+						gramD[key][valChar] += 1
+					else:
+						gramD[key][valChar] = 1
+				else:
+					gramD[key] = {}
+					gramD[key][valChar] = 1
+
+	#check that root is valid again, now with gram info
+	while (len(root) > 0 and len(root) < gramLen-1) or root != '' and not canContinue(rootState):
+		if (len(root) > 0 and len(root) < gramLen-1):
+			print("Root must be at least (" + str(gramLen-2) + ") characters long")
+		elif not canContinue(rootState):
+			print("Root is never followed by a non-whitespace character")
 		print("Please re-enter: ")
 		root = " "+input()
 		rootState = root[-(gramLen-1):]
 
-print('Loading...')
+	#GENERATION
+	gen=''		#'generation'. generated characters added to gen. gen printed when complete
+	NN=False	#"No Newline". passed to getNextChar() when the word should not end
+	initLen=0	#length of passed root or initial gram
+	print("<Hit ENTER to generate words>")
 
-#populate startGramD and gramD 
-with open(trainingSet) as file:
-	for line in file:
-		line=" "+line
-		for i in range(len(line)-gramLen+1): #+1 to include newline
-			key = line[i:i+gramLen-1]
-			valChar = line[i+gramLen-1]
-			if i == 0:
-				totalStartGrams += 1
-				if key in startGramD:
-					startGramD[key] += 1
-				else:
-					startGramD[key] = 1
-			if key in gramD:
-				if valChar in gramD[key]:
-					gramD[key][valChar] += 1
-				else:
-					gramD[key][valChar] = 1
+	while input() == '':
+		
+		if root == '': #user did not pass a root
+			gen = getFirstGram()
+		else:
+			gen = root
+			if iSet or cSet: 
+				relFreqL.append(1)
+				expectL.append(0)
+
+		initLen = len(gen)
+
+		while gen[-1] != '\n':
+			if vSet or iSet or mSet or tSet: 
+				if iSet:
+					printStats()
+				print(gen)
+
+			if len(gen) < minLen+1:	#+1 because trailing whitespace is part of generation
+				NN = True
 			else:
-				gramD[key] = {}
-				gramD[key][valChar] = 1
+				NN = False
 
-#check that root is valid again, now with gram info
-while (len(root) > 0 and len(root) < gramLen-1) or root != '' and not canContinue(rootState):
-	if (len(root) > 0 and len(root) < gramLen-1):
-		print("Root must be at least (" + str(gramLen-2) + ") characters long")
-	elif not canContinue(rootState):
-		print("Root is never followed by a non-whitespace character")
-	print("Please re-enter: ")
-	root = " "+input()
-	rootState = root[-(gramLen-1):]
+			#action
+			state=gen[-(gramLen-1):]
+			result=getNextChar(state, NN)
+			if result != False and len(gen.strip()) <= maxLen:
+				gen = gen + result[0]
+				if iSet or cSet:
+					relFreqL.append(result[1])
+					expectL.append(result[2])
+			else:
+				deadEndL.append(state)
+				for i in range(deadEndL.count(state)):
+					if len(gen) > initLen:
+						gen = gen[0:-1]
+						if iSet or cSet: 
+							expectL.pop()
+							relFreqL.pop()
+					else: 
+						break
 
-#GENERATION
-gen=''		#'generation'. generated characters added to gen. gen printed when complete
-NN=False	#"No Newline". passed to getNextChar() when the word should not end
-initLen=0	#length of passed root or initial gram
-print("<Hit ENTER to generate words>")
+			if mSet:
+				input()
+			if tSet:
+				time.sleep(waitTime)
 
-while input() == '':
-	
-	if root == '': #user did not pass a root
-		gen = getFirstGram()
-	else:
-		gen = root
-		if iSet or cSet: 
-			relFreqL.append(1)
-			expectL.append(0)
 
-	initLen = len(gen)
+		#print final complete generation
+		if iSet:
+			printStats()
 
-	while gen[-1] != '\n':
-		if vSet or iSet or mSet or tSet: 
-			if iSet:
-				printStats()
-			print(gen)
-
-		if len(gen) < minLen+1:	#+1 because trailing whitespace is part of generation
-			NN = True
+		if cSet:
+			cPrint(gen)
 		else:
-			NN = False
+			print(gen,end='')
 
-		#action
-		state=gen[-(gramLen-1):]
-		result=getNextChar(state, NN)
-		if result != False and len(gen.strip()) <= maxLen:
-			gen = gen + result[0]
-			if iSet or cSet:
-				relFreqL.append(result[1])
-				expectL.append(result[2])
-		else:
-			deadEndL.append(state)
-			for i in range(deadEndL.count(state)):
-				if len(gen) > initLen:
-					gen = gen[0:-1]
-					if iSet or cSet: 
-						expectL.pop()
-						relFreqL.pop()
-				else: 
-					break
+		deadEndL.clear()
+		expectL.clear()
+		relFreqL.clear()
 
-		if mSet:
-			input()
-		if tSet:
-			time.sleep(waitTime)
-
-
-	#print final complete generation
-	if iSet:
-		printStats()
-
-	if cSet:
-		cPrint(gen)
-	else:
-		print(gen,end='')
-
-	deadEndL.clear()
-	expectL.clear()
-	relFreqL.clear()
-
-print("EXIT")
+	print("EXIT")
 
 
 
